@@ -1,0 +1,71 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: flux.juvensys.com
+spec:
+  defaultCompositionRef:
+    name: flux-composition
+  group: juvensys.com
+  names:
+    kind: Flux
+    plural: flux
+  claimNames:
+    kind: FluxClaim
+    plural: fluxclaims
+  versions:
+  - name: v1alpha1
+    served: true
+    referenceable: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+          spec:
+            type: object
+            properties:
+              id:
+                type: string
+                description: ID of this flux deployment that other objects will use to refer to it.
+              parameters:
+                type: object
+                properties:
+                  helm-controller-image:
+                    description: The container image for the helm-controller
+                    type: string
+                    default: ghcr.io/fluxcd/helm-controller:v0.11.2
+                  kustomize-controller-image:
+                    description: The container image for the kustomize-controller
+                    type: string
+                    default: ghcr.io/fluxcd/kustomize-controller:v0.14.1
+                  notification-controller-image:
+                    description: The container image for the notification-controller
+                    type: string
+                    default: ghcr.io/fluxcd/notification-controller:v0.16.0
+                  source-controller-image:
+                    description: The container image for the source-controller
+                    type: string
+                    default: ghcr.io/fluxcd/source-controller:v0.15.4
+                  private-repo-user:
+                    description: The user name of the repo. If the repo is private.
+                    type: string
+                  private-repo-password:
+                    description: The password of the repo. If the repo is private.
+                    type: string
+              kubeConfig:
+                description: The Kubeconfig details.
+                type: object
+                properties:
+                  secretNamespace:
+                    description: Namespace of secret
+                    type: string
+                    default: crossplane-system
+                  secretName:
+                    description: secretName
+                    type: string
+                  secretKey:
+                    description: secretKey
+                    type: string
+                    default: kubeconfig
+            required:
+            - id
+            - kubeConfig

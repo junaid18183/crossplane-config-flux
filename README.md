@@ -104,4 +104,4 @@ NAME                          INSTALLED   HEALTHY   PACKAGE                     
 junaid18183-crossplane-flux   True        True      junaid18183/crossplane-flux:0.0.1   15s
 ```
 
-This configuration should install the `crossplane-provider-terraform` autocratic, as the dependency is added on it.
+This configuration should install the `crossplane-provider-terraform` automatic, as the dependency is added on it.

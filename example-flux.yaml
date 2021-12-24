@@ -1,7 +1,7 @@
 apiVersion: ijuned.com/v1alpha1
 kind: Flux
 metadata:
-  name: demo
+  name: crossplane-demo
 spec:
   parameters:
     flux_version: v0.24.1

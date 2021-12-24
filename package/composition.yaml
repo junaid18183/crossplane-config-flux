@@ -56,6 +56,8 @@ spec:
       patches:
       - type: PatchSet
         patchSetName: Common
+      readinessChecks:
+        - type: None
     - name: terraform-flux
       base:
         apiVersion: tf.crossplane.io/v1alpha1
@@ -111,3 +113,8 @@ spec:
         - type: FromCompositeFieldPath
           fromFieldPath: "spec.parameters.flux_version"
           toFieldPath: "spec.forProvider.vars[2].value"
+        - type: ToCompositeFieldPath
+          fromFieldPath: spec.forProvider.vars[2].value
+          toFieldPath: status.version
+      readinessChecks:
+        - type: None

@@ -4,7 +4,7 @@ metadata:
   name: flux.juvensys.com
 spec:
   defaultCompositionRef:
-    name: flux-composition
+    name: flux-terraform
   group: juvensys.com
   names:
     kind: Flux
@@ -25,7 +25,7 @@ spec:
             properties:
               id:
                 type: string
-                description: ID of this flux deployment that other objects will use to refer to it.
+                description: ID of this application that other objects will use to refer to it.
               parameters:
                 type: object
                 properties:
@@ -67,5 +67,5 @@ spec:
                     type: string
                     default: kubeconfig
             required:
-            - id
             - kubeConfig
+            - id

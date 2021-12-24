@@ -1,12 +1,10 @@
-apiVersion: example.org/v1alpha1
-kind: VM
+apiVersion: juvensys.com/v1alpha1
+kind: Flux
 metadata:
-  name: example-machine
-  annotations:
-    crossplane.io/external-name: cool-example
+  name: juned
 spec:
-  parameters:
-    size: small
-    location: west-coast
-  writeConnectionSecretToRef:
-    name: example-machine
+  id: juned
+  kubeConfig:
+    secretNamespace: crossplane-system
+    secretName: cluster-config
+    secretKey: kubeconfig

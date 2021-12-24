@@ -1,97 +1,80 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: compositevms.example.org
+  name: flux-terraform
   labels:
     provider: terraform
 spec:
   writeConnectionSecretsToNamespace: crossplane-system
   compositeTypeRef:
-    apiVersion: example.org/v1alpha1
-    kind: CompositeVM
+    apiVersion: juvensys.com/v1alpha1
+    kind: Flux
+  # patchSets:
+  #   - name: Common
+  #     patches:
+  #       - fromFieldPath: metadata.name
+  #         toFieldPath: metadata.name
   resources:
-    - name: terraform-gcp-vm
+    - name: terraform
+      base:
+        apiVersion: tf.crossplane.io/v1alpha1
+        kind: ProviderConfig
+        spec:
+          credentials:
+          - filename: kubeconfig.yaml
+            source: Secret
+            secretRef:
+              namespace: crossplane-system
+              name: cluster-config
+              key: kubeconfig
+          configuration: |
+            terraform {
+              required_version = ">= 0.13"
+              backend "kubernetes" {
+              secret_suffix    = "state"
+              config_path      = "kubeconfig.yaml"
+            }
+              required_providers {
+                kubectl = {
+                  source  = "gavinbunney/kubectl"
+                  version = ">= 1.13.1"
+                }
+                flux = {
+                  source  = "fluxcd/flux"
+                  version = ">= 0.8.1"
+                }
+              }
+            }
+            provider "flux" {}
+            provider "kubectl" {
+              config_path = "kubeconfig.yaml"
+            }
+      patches:
+      - fromFieldPath: spec.id
+        toFieldPath: metadata.name
+    - name: terraform-flux
       base:
         apiVersion: tf.crossplane.io/v1alpha1
         kind: Workspace
         spec:
+          # providerConfigRef:
+          #   name: flux-terraform
           forProvider:
             source: Inline
             module: |
-              // The values of these variables are set by the 'vars' YAML block
-              // below, which can in turn be set by composition patches.
-              variable "machine_type" {
-                type = string
+              data "flux_install" "main" {
+                target_path = "dev"
               }
-
-              variable "zone" {
-                type = string
+              data "kubectl_file_documents" "docs" {
+                content = data.flux_install.main.content
               }
-
-              // Expose the VM's internal IP address as a Crossplane connection
-              // secret key named 'address'.
-              output "address" {
-                value = google_compute_instance.vm.network_interface.0.network_ip
+              resource "kubectl_manifest" "test" {
+                  count     = length(data.kubectl_file_documents.docs.documents)
+                  yaml_body = element(data.kubectl_file_documents.docs.documents, count.index)
               }
-
-              resource "google_compute_instance" "vm" {
-                // We use the workspace name to derive the compute instance's
-                // name from the workspace's external name annotation.
-                name         = terraform.workspace
-
-                // The machine type and zone are exposed as Terraform variables.
-                // This lets us use FromCompositeFieldPath patches to derive
-                // their values from the composite resource.
-                machine_type = var.machine_type
-                zone         = var.zone
-              
-                boot_disk {
-                  initialize_params {
-                    image = "debian-cloud/debian-9"
-                  }
-                }
-              
-                network_interface {
-                  network = "default"
-              
-                  access_config {
-                    // Ephemeral IP
-                  }
-                }
-              }
-            vars:
-              # We patch in the values for these variables below.
-              - key: machine_type
-              - key: zone
-          writeConnectionSecretToRef:
-            namespace: crossplane-system
       patches:
         - type: FromCompositeFieldPath
           fromFieldPath: "metadata.annotations[crossplane.io/external-name]"
           toFieldPath: "metadata.annotations[crossplane.io/external-name]"
-        - type: FromCompositeFieldPath
-          fromFieldPath: "spec.parameters.size"
-          toFieldPath: "spec.forProvider.vars[0].value"
-          transforms:
-            - type: map
-              map:
-                small: e2-standard-2
-                medium: e2-standard-8
-                large: e2-standard-32
-        - type: FromCompositeFieldPath
-          fromFieldPath: "spec.parameters.location"
-          toFieldPath: "spec.forProvider.vars[1].value"
-          transforms:
-            - type: map
-              map:
-                east-coast: us-east1-b
-                west-coast: us-west1-b
-        - type: FromCompositeFieldPath
-          fromFieldPath: "metadata.uid"
-          toFieldPath: "spec.writeConnectionSecretToRef.name"
-          transforms:
-            - type: string
-              string:
-                fmt: "%s-vm"
-      connectionDetails:
-        - fromConnectionSecretKey: address
+        - fromFieldPath: spec.id
+          toFieldPath: spec.providerConfigRef.name

@@ -71,13 +71,13 @@ spec:
               variable "image_registry" {
                 type = string
               }
-              variable "image_pull_secrets" {
+              variable "image_pull_secret" {
                 type = string
               }
 
               data "flux_install" "main" {
                 target_path        = "dev"
-                image_pull_secrets = var.image_pull_secrets
+                image_pull_secrets = var.image_pull_secret
                 registry           = var.image_registry
                 version            = var.flux_version
               }
@@ -90,7 +90,7 @@ spec:
               }
             vars:
               # We patch in the values for these variables below.
-              - key: image_pull_secrets
+              - key: image_pull_secret
               - key: image_registry
               - key: flux_version
               

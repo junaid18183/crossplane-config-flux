@@ -1,7 +1,7 @@
 apiVersion: juvensys.com/v1alpha1
 kind: Flux
 metadata:
-  name: juned
+  name: demo
 spec:
   parameters:
     flux_version: v0.24.1

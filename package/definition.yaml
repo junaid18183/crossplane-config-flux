@@ -27,14 +27,14 @@ spec:
                 type: object
                 properties:
                   flux_version:
-                    description: The the flux version to install
+                    description: The the flux version to install.
                     type: string
                     default: v0.24.1
                   image_registry:
                     description: Container registry where the toolkit images are published.
                     type: string
                     default: ghcr.io/fluxcd
-                  image_pull_secrets:
+                  image_pull_secret:
                     description: Kubernetes secret name used for pulling the toolkit images from a private registry.
                     type: string
                     default: ""

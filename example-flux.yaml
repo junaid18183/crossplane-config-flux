@@ -1,4 +1,4 @@
-apiVersion: juvensys.com/v1alpha1
+apiVersion: ijuned.com/v1alpha1
 kind: Flux
 metadata:
   name: demo

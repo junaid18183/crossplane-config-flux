@@ -29,7 +29,7 @@ kubectl -n crossplane-system create secret generic cluster-config --from-file=ku
 You can deploy the flux using the CR as [below](./example-flux.yaml),
 
 ```yaml
-apiVersion: juvensys.com/v1alpha1
+apiVersion: ijuned.com/v1alpha1
 kind: Flux
 metadata:
   name: demo
@@ -52,7 +52,7 @@ You can additioanly provide the following parameters
 
 ```bash
 kubectl apply -f example-flux.yaml
-flux.juvensys.com/demo created
+flux.ijuned.com/demo created
 ```
 
 
@@ -64,7 +64,7 @@ You can check the status of the flux deployment using following kubectl
 ````bash
 kubectl get flux,workspace
 NAME                     READY   COMPOSITION      AGE
-flux.juvensys.com/demo   False   flux-terraform   33s
+flux.ijuned.com/demo   False   flux-terraform   33s
 
 NAME                              AGE
 workspace.tf.crossplane.io/demo   32s

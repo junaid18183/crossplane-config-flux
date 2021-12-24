@@ -9,11 +9,15 @@ spec:
   compositeTypeRef:
     apiVersion: juvensys.com/v1alpha1
     kind: Flux
-  # patchSets:
-  #   - name: Common
-  #     patches:
-  #       - fromFieldPath: metadata.name
-  #         toFieldPath: metadata.name
+  patchSets:
+    - name: Common
+      patches:
+        - fromFieldPath: metadata.name
+          toFieldPath: metadata.name
+    - name: ProviderName
+      patches:
+        - fromFieldPath: metadata.name
+          toFieldPath: spec.providerConfigRef.name
   resources:
     - name: terraform
       base:
@@ -50,8 +54,8 @@ spec:
               config_path = "kubeconfig.yaml"
             }
       patches:
-      - fromFieldPath: spec.id
-        toFieldPath: metadata.name
+      - type: PatchSet
+        patchSetName: Common
     - name: terraform-flux
       base:
         apiVersion: tf.crossplane.io/v1alpha1
@@ -91,6 +95,10 @@ spec:
               - key: flux_version
               
       patches:
+        - type: PatchSet
+          patchSetName: Common
+        - type: PatchSet
+          patchSetName: ProviderName
         - type: FromCompositeFieldPath
           fromFieldPath: "metadata.annotations[crossplane.io/external-name]"
           toFieldPath: "metadata.annotations[crossplane.io/external-name]"
@@ -103,7 +111,3 @@ spec:
         - type: FromCompositeFieldPath
           fromFieldPath: "spec.parameters.flux_version"
           toFieldPath: "spec.forProvider.vars[2].value"
-        - fromFieldPath: spec.id
-          toFieldPath: spec.providerConfigRef.name
-        - fromFieldPath: spec.id
-          toFieldPath: metadata.name

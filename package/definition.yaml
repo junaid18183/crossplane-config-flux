@@ -23,9 +23,6 @@ spec:
           spec:
             type: object
             properties:
-              id:
-                type: string
-                description: ID of this application that other objects will use to refer to it.
               parameters:
                 type: object
                 properties:
@@ -58,4 +55,3 @@ spec:
                     default: kubeconfig
             required:
             - kubeConfig
-            - id

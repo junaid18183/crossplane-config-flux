@@ -3,7 +3,6 @@ kind: Flux
 metadata:
   name: juned
 spec:
-  id: juned
   parameters:
     flux_version: v0.24.1
   kubeConfig:

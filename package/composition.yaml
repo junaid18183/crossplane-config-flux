@@ -57,24 +57,53 @@ spec:
         apiVersion: tf.crossplane.io/v1alpha1
         kind: Workspace
         spec:
-          # providerConfigRef:
-          #   name: flux-terraform
           forProvider:
             source: Inline
             module: |
+              
+              variable "flux_version" {
+                type = string
+              }
+              variable "image_registry" {
+                type = string
+              }
+              variable "image_pull_secrets" {
+                type = string
+              }
+
               data "flux_install" "main" {
-                target_path = "dev"
+                target_path        = "dev"
+                image_pull_secrets = var.image_pull_secrets
+                registry           = var.image_registry
+                version            = var.flux_version
               }
               data "kubectl_file_documents" "docs" {
                 content = data.flux_install.main.content
               }
               resource "kubectl_manifest" "test" {
-                  count     = length(data.kubectl_file_documents.docs.documents)
-                  yaml_body = element(data.kubectl_file_documents.docs.documents, count.index)
+                count     = length(data.kubectl_file_documents.docs.documents)
+                yaml_body = element(data.kubectl_file_documents.docs.documents, count.index)
               }
+            vars:
+              # We patch in the values for these variables below.
+              - key: image_pull_secrets
+              - key: image_registry
+              - key: flux_version
+              
       patches:
         - type: FromCompositeFieldPath
           fromFieldPath: "metadata.annotations[crossplane.io/external-name]"
           toFieldPath: "metadata.annotations[crossplane.io/external-name]"
+        - type: FromCompositeFieldPath
+          fromFieldPath: "spec.parameters.image_pull_secrets"
+          toFieldPath: "spec.forProvider.vars[0].value"
+        - type: FromCompositeFieldPath
+          fromFieldPath: "spec.parameters.image_registry"
+          toFieldPath: "spec.forProvider.vars[1].value"
+        - type: FromCompositeFieldPath
+          fromFieldPath: "spec.parameters.flux_version"
+          toFieldPath: "spec.forProvider.vars[2].value"
         - fromFieldPath: spec.id
           toFieldPath: spec.providerConfigRef.name
+        - fromFieldPath: spec.id
+          toFieldPath: metadata.name

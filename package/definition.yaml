@@ -29,28 +29,18 @@ spec:
               parameters:
                 type: object
                 properties:
-                  helm-controller-image:
-                    description: The container image for the helm-controller
+                  flux_version:
+                    description: The the flux version to install
                     type: string
-                    default: ghcr.io/fluxcd/helm-controller:v0.11.2
-                  kustomize-controller-image:
-                    description: The container image for the kustomize-controller
+                    default: v0.24.1
+                  image_registry:
+                    description: Container registry where the toolkit images are published.
                     type: string
-                    default: ghcr.io/fluxcd/kustomize-controller:v0.14.1
-                  notification-controller-image:
-                    description: The container image for the notification-controller
+                    default: ghcr.io/fluxcd
+                  image_pull_secrets:
+                    description: Kubernetes secret name used for pulling the toolkit images from a private registry.
                     type: string
-                    default: ghcr.io/fluxcd/notification-controller:v0.16.0
-                  source-controller-image:
-                    description: The container image for the source-controller
-                    type: string
-                    default: ghcr.io/fluxcd/source-controller:v0.15.4
-                  private-repo-user:
-                    description: The user name of the repo. If the repo is private.
-                    type: string
-                  private-repo-password:
-                    description: The password of the repo. If the repo is private.
-                    type: string
+                    default: ""
               kubeConfig:
                 description: The Kubeconfig details.
                 type: object

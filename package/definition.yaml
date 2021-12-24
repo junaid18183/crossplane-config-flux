@@ -37,7 +37,7 @@ spec:
                   image_pull_secret:
                     description: Kubernetes secret name used for pulling the toolkit images from a private registry.
                     type: string
-                    default: ''
+                    default: ""
               kubeConfig:
                 description: The Kubeconfig details.
                 type: object

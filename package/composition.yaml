@@ -103,7 +103,7 @@ spec:
           fromFieldPath: "metadata.annotations[crossplane.io/external-name]"
           toFieldPath: "metadata.annotations[crossplane.io/external-name]"
         - type: FromCompositeFieldPath
-          fromFieldPath: "spec.parameters.image_pull_secrets"
+          fromFieldPath: "spec.parameters.image_pull_secret"
           toFieldPath: "spec.forProvider.vars[0].value"
         - type: FromCompositeFieldPath
           fromFieldPath: "spec.parameters.image_registry"

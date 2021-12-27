@@ -56,8 +56,19 @@ spec:
       patches:
       - type: PatchSet
         patchSetName: Common
+
+      - type: FromCompositeFieldPath
+        fromFieldPath: "spec.kubeConfig.secretNamespace"
+        toFieldPath: "spec.credentials[0].secretRef.namespace"
+      - type: FromCompositeFieldPath
+        fromFieldPath: "spec.kubeConfig.secretName"
+        toFieldPath: "spec.credentials[0].secretRef.name"
+      - type: FromCompositeFieldPath
+        fromFieldPath: "spec.kubeConfig.secretKey"
+        toFieldPath: "spec.credentials[0].secretRef.key"
       readinessChecks:
         - type: None
+
     - name: terraform-flux
       base:
         apiVersion: tf.crossplane.io/v1alpha1
@@ -92,9 +103,9 @@ spec:
               }
             vars:
               # We patch in the values for these variables below.
-              - key: image_pull_secret
-              - key: image_registry
               - key: flux_version
+              - key: image_registry
+              - key: image_pull_secret
               
       patches:
         - type: PatchSet
@@ -104,15 +115,17 @@ spec:
         - type: FromCompositeFieldPath
           fromFieldPath: "metadata.annotations[crossplane.io/external-name]"
           toFieldPath: "metadata.annotations[crossplane.io/external-name]"
+
         - type: FromCompositeFieldPath
-          fromFieldPath: "spec.parameters.image_pull_secret"
+          fromFieldPath: "spec.parameters.flux_version"
           toFieldPath: "spec.forProvider.vars[0].value"
         - type: FromCompositeFieldPath
           fromFieldPath: "spec.parameters.image_registry"
           toFieldPath: "spec.forProvider.vars[1].value"
         - type: FromCompositeFieldPath
-          fromFieldPath: "spec.parameters.flux_version"
+          fromFieldPath: "spec.parameters.image_pull_secret"
           toFieldPath: "spec.forProvider.vars[2].value"
+
         - type: ToCompositeFieldPath
           fromFieldPath: spec.forProvider.vars[2].value
           toFieldPath: status.version

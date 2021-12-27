@@ -14,6 +14,8 @@ spec:
       patches:
         - fromFieldPath: metadata.name
           toFieldPath: metadata.name
+        - fromFieldPath: "metadata.annotations[crossplane.io/external-name]"
+          toFieldPath: "metadata.annotations[crossplane.io/external-name]"
     - name: ProviderName
       patches:
         - fromFieldPath: metadata.name
@@ -112,9 +114,6 @@ spec:
           patchSetName: Common
         - type: PatchSet
           patchSetName: ProviderName
-        - type: FromCompositeFieldPath
-          fromFieldPath: "metadata.annotations[crossplane.io/external-name]"
-          toFieldPath: "metadata.annotations[crossplane.io/external-name]"
 
         - type: FromCompositeFieldPath
           fromFieldPath: "spec.parameters.flux_version"

@@ -127,7 +127,7 @@ spec:
           toFieldPath: "spec.forProvider.vars[2].value"
 
         - type: ToCompositeFieldPath
-          fromFieldPath: spec.forProvider.vars[2].value
+          fromFieldPath: spec.forProvider.vars[0].value
           toFieldPath: status.version
       readinessChecks:
         - type: None

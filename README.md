@@ -1,35 +1,65 @@
-# CrossPlane Configuration Package for the Flux Deployment
+# crossplane-config-flux
 
-This Configuration Package depends on `crossplane/provider-terraform` provider. 
+Crossplane configuration that provides Composite Resource Claim `Flux` to deploy the fluxCD in your kubernetes cluster.
 
-Under the hood it uses the [Terraform Provider Flux](https://github.com/fluxcd/terraform-provider-flux)  and [Terraform Provider kubectl](https://github.com/gavinbunney/terraform-provider-kubectl) 
+Under the hood it uses the [Crossplane Helm Provider](https://github.com/crossplane-contrib/provider-helm.git) and [flux community helm chart](https://github.com/fluxcd-community/helm-charts/tree/main/charts/flux2) to deploy the flux
 
 
+# Getting Started
 
-### Install the CrossPlane Terraform Provider
+## Prerequsite 
+1. Control plane Kubernetes cluster it can be a local kind cluster 
+1. [Install the CrossPlane in your cluster](#install-the-crossplane-in-your-cluster)
+1. Optional - Install the Crossplane CLI using the instructions [here](https://crossplane.io/docs/v1.9/getting-started/install-configure.html)
 
-Install the crossplane Terraform Provider in yout managent cluster
+
+1. Create a target Kubernetes cluster
+
+1. Create the secret in your local cluster in namespace crossplane-system with the kubeconfig of your target cluster where you want to install the flux.
+      ```
+      kubectl -n crossplane-system create secret generic cluster-config --from-file=kubeconfig=/tmp/vcluster-flux.yaml
+      ```
+
+1. Install this configuration. Use the [packages](https://github.com/junaid18183?tab=packages&repo_name=crossplane-config-flux) page to find the latest version.
+
+    ```shell
+    kubectl crossplane install configuration ghcr.io/junaid18183/crossplane-config-flux:<version>
+    ```
+
+
+1. Provision the FluxCD using the [Claims](#claim-flux) that are offered by this configuration.
+
+----------------------
+
+# Install the CrossPlane in your cluster
+
+You can install the Crossplane in your local/control cluster using official helm chart
 
 ```bash
-kubectl crossplane install provider crossplane/provider-terraform:v0.1.2
+helm repo add crossplane-stable \
+    https://charts.crossplane.io/stable
 
-kubectl get providers
-NAME                            INSTALLED   HEALTHY   PACKAGE                                AGE
-crossplane-provider-terraform   True        True      crossplane/provider-terraform:v0.1.2   6h56m
+helm repo update
+
+helm upgrade --install \
+    crossplane crossplane-stable/crossplane \
+    --namespace crossplane-system \
+    --create-namespace \
+    --wait
 ```
 
-Create the secret in crossplane-system with the `kubeconfig` of your target cluster where you want to install the flux. 
+----------------------
 
-```bash
-kubectl -n crossplane-system create secret generic cluster-config --from-file=kubeconfig=/tmp/vcluster-flux.yaml
-```
+# Claim: Flux
 
-### Deploy the Flux
+Use this Composite Resource Claim to provision a FluxCD in your cluster,
 
-You can deploy the flux using the CR as [below](./example-flux.yaml),
+## Usage
+
+1. Deploy FluxCD using `kubectl apply -f <filename>`. Here's an example [configuration:](examples/flux.yaml)
 
 ```yaml
-apiVersion: ijuned.com/v1alpha1
+apiVersion: ijuned.com/v1beta1
 kind: Flux
 metadata:
   name: demo
@@ -50,58 +80,4 @@ You can additioanly provide the following parameters
 | parameters/image_registry    | Container registry where the toolkit images are published    | ghcr.io/fluxcd |
 | parameters/image_pull_secret | Kubernetes secret name used for pulling the toolkit images from a private registry | ''             |
 
-```bash
-kubectl apply -f example-flux.yaml
-flux.ijuned.com/demo created
-```
-
-
-
-## Check status
-
-You can check the status of the flux deployment using following kubectl
-
-````bash
-kubectl get flux,workspace
-NAME                     READY   COMPOSITION      AGE
-flux.ijuned.com/demo   False   flux-terraform   33s
-
-NAME                              AGE
-workspace.tf.crossplane.io/demo   32s
-````
-
-
-
-## Publishing the Package
-
-Download the crossplane plugin if not done already,
-
-```bash
-curl -sL https://raw.githubusercontent.com/crossplane/crossplane/release-1.5/install.sh | sh
-sudo mv kubectl-crossplane /usr/local/bin
-kubectl crossplane --help
-```
-
-Build the configuration package 
-
-```
-kubectl crossplane build configuration -f package/
-
-[root@tiber flux_crossplane_package]# ls -l package/crossplane-flux-*.xpkg
--rw-r--r--. 1 vagrant vagrant 5632 Dec 24 12:31 package/crossplane-flux-b16c5eb3079f.xpkg
-
-kubectl crossplane push configuration -f package/crossplane-flux-b16c5eb3079f.xpkg  junaid18183/crossplane-flux:0.0.1
-```
-
-You can downlaod the configuration now, 
-
-```
-kubectl crossplane install configuration junaid18183/crossplane-flux:0.0.1
-configuration.pkg.crossplane.io/junaid18183-crossplane-flux created
-
-kubectl get configurations.pkg.crossplane.io
-NAME                          INSTALLED   HEALTHY   PACKAGE                             AGE
-junaid18183-crossplane-flux   True        True      junaid18183/crossplane-flux:0.0.1   15s
-```
-
-This configuration should install the `crossplane-provider-terraform` automatic, as the dependency is added on it.
+----------------------

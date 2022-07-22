@@ -1,0 +1,75 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: flux-helm
+  labels:
+    provider: helm
+spec:
+  compositeTypeRef:
+    apiVersion: ijuned.com/v1beta1
+    kind: Flux
+  patchSets:
+  - name: Common
+    patches:
+    - fromFieldPath: metadata.labels
+  resources:
+  - name: helm
+    base:
+      apiVersion: helm.crossplane.io/v1beta1
+      kind: ProviderConfig
+      spec:
+        credentials:
+          source: InjectedIdentity # https://github.com/crossplane-contrib/provider-helm/blob/master/examples/provider-config/provider-config-incluster.yaml
+          # - filename: kubeconfig.yaml
+          #   source: Secret
+          #   secretRef:
+          #     namespace: crossplane-system
+          #     name: cluster-config
+          #     key: kubeconfig
+    patches:
+    - type: PatchSet
+      patchSetName: Common
+    - fromFieldPath: metadata.name
+      toFieldPath: metadata.name
+      transforms:
+        - type: string
+          string:
+            fmt: "%s-helm"
+    readinessChecks:
+      - type: None
+
+  - name: flux2
+    base:
+      apiVersion: helm.crossplane.io/v1beta1
+      kind: Release
+      spec:
+        rollbackLimit: 3
+        forProvider:
+          chart:
+            name: flux2
+            repository: https://fluxcd-community.github.io/helm-charts
+            version: "1.0.0"
+          namespace: flux-system
+          set:
+          - name: name
+            value: flux2
+          - name: sourcecontroller.image
+          - name: sourcecontroller.tag
+    patches:
+    - type: PatchSet
+      patchSetName: Common
+    - fromFieldPath: metadata.name
+      toFieldPath: spec.providerConfigRef.name
+      transforms:
+        - type: string
+          string:
+            fmt: "%s-helm"
+    - fromFieldPath: spec.parameters.namespace
+      toFieldPath: spec.forProvider.namespace
+    - fromFieldPath: spec.parameters.sourcecontroller_image
+      toFieldPath: spec.forProvider.set[1].value
+    - fromFieldPath: spec.parameters.sourcecontroller_tag
+      toFieldPath: spec.forProvider.set[2].value
+    - type: ToCompositeFieldPath
+      fromFieldPath: spec.forProvider.set[2].value
+      toFieldPath: status.version

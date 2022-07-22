@@ -1,10 +1,11 @@
-apiVersion: ijuned.com/v1alpha1
+apiVersion: ijuned.com/v1beta1
 kind: Flux
 metadata:
   name: demo2
 spec:
   parameters:
-    flux_version: v0.24.1
+    sourcecontroller_image: ghcr.io/fluxcd/source-controller
+    sourcecontroller_tag: v0.25.9
   kubeConfig:
     secretNamespace: crossplane-system
     secretName: cluster-config

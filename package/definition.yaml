@@ -4,7 +4,7 @@ metadata:
   name: flux.ijuned.com
 spec:
   defaultCompositionRef:
-    name: flux-terraform
+    name: flux-helm
   group: ijuned.com
   names:
     kind: Flux
@@ -13,7 +13,7 @@ spec:
     kind: FluxClaim
     plural: fluxclaims
   versions:
-  - name: v1alpha1
+  - name: v1beta1
     served: true
     referenceable: true
     schema:
@@ -35,14 +35,18 @@ spec:
                     - Orphan
                     - Delete
                     type: string
-                  flux_version:
-                    description: The the flux version to install.
+                  sourcecontroller_image:
+                    description: image repo for the sourcecontroller
                     type: string
-                    default: v0.24.1
-                  image_registry:
-                    description: Container registry where the toolkit images are published.
+                    default: ghcr.io/fluxcd/source-controller
+                  namespace:
+                    description: Namespace to deploy the flux
                     type: string
-                    default: ghcr.io/fluxcd
+                    default: flux-system
+                  sourcecontroller_tag:
+                    description: image repo for the sourcecontroller
+                    type: string
+                    default: v0.25.9
                   image_pull_secret:
                     description: Kubernetes secret name used for pulling the toolkit images from a private registry.
                     type: string

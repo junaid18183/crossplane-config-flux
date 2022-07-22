@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - release-*
+      - v0.0.2
+  workflow_dispatch: {}
+
+jobs:
+  configuration:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+          fetch-depth: 0
+      # The tagger step uses the same logic in the build submodule to generate package tag
+      # https://github.com/upbound/build/blob/4f64913157a952dbe77cd9e05457d9abe695a1d4/makelib/common.mk#L193
+      - name: Set tag
+        run: echo "::set-output name=VERSION_TAG::$(git describe --dirty --always --tags | sed 's/-.*//' )"
+        id: tagger
+      - name: Build
+        uses: crossplane-contrib/xpkg-action@v0.2.0
+        with:
+          channel: stable
+          version: current
+          command : build configuration -f ${{ github.workspace }}/package/ --name flux-package.xpkg
+      - name: Install Up CLI and Push Package
+        run: |
+          curl -sL https://cli.upbound.io | sh
+          ./up login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+          ./up xpkg push -f package.xpkg xpkg.upbound.io/nate-organization/cp-pkg-platform-ref-azure:${{ steps.tagger.outputs.VERSION_TAG }}
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Update manifest
+        run: |
+          sed -i -e "s|package: registry.upbound.io/nate-organization/cp-pkg-platform-ref-azure:.*|package: registry.upbound.io/nate-organization/cp-pkg-platform-ref-azure:${{ steps.tagger.outputs.VERSION_TAG }}|g" ./configuration/configuration.yaml
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v7
+        with:
+          add: '.'
+          message: "github bot package version update"
+          signoff: true

@@ -11,18 +11,18 @@ kubectl crossplane --help
 Build the configuration package 
 
 ```
-kubectl crossplane build configuration -f package/
+kubectl crossplane build configuration -f package/ --name flux-package.xpkg
 
-[root@tiber flux_crossplane_package]# ls -l package/crossplane-flux-*.xpkg
--rw-r--r--. 1 vagrant vagrant 5632 Dec 24 12:31 package/crossplane-flux-b16c5eb3079f.xpkg
+[root@tiber flux_crossplane_package]# ls -l package/*.xpkg
+-rw-r--r--  1 junedm  staff  5632 Jul 22 19:09 package/package.xpkg
 
-kubectl crossplane push configuration -f package/crossplane-flux-b16c5eb3079f.xpkg  ghcr.io/junaid18183/crossplane-config-flux
+kubectl crossplane push configuration -f package/flux-package.xpkg  ghcr.io/junaid18183/crossplane-config-flux:0.0.1
 ```
 
 You can downlaod the configuration now, 
 
 ```
-kubectl crossplane install configuration ghcr.io/junaid18183/crossplane-config-flux
+kubectl crossplane install configuration ghcr.io/junaid18183/crossplane-config-flux:0.0.1
 configuration.pkg.crossplane.io/junaid18183-crossplane-flux created
 
 kubectl get configurations.pkg.crossplane.io
@@ -30,4 +30,4 @@ NAME                          INSTALLED   HEALTHY   PACKAGE                     
 junaid18183-crossplane-flux   True        True      ghcr.io/junaid18183/crossplane-config-flux   15s
 ```
 
-This configuration should install the `crossplane-provider-terraform` automatic, as the dependency is added on it.
+This configuration should install the `crossplane-provider-helm` automatic, as the dependency is added on it.

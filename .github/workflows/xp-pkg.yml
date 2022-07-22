@@ -33,4 +33,4 @@ jobs:
           curl -sL https://raw.githubusercontent.com/crossplane/crossplane/master/install.sh | sh
           mv kubectl-crossplane /usr/local/bin
           #login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
-          kubectl crossplane push configuration -f package.xpkg ush configuration -f package/flux-package.xpkg  ghcr.io/junaid18183/crossplane-config-flux:${{ steps.tagger.outputs.VERSION_TAG }}
+          kubectl crossplane push configuration -f package.xpkg ghcr.io/junaid18183/crossplane-config-flux:${{ steps.tagger.outputs.VERSION_TAG }}

@@ -27,11 +27,11 @@ jobs:
         with:
           channel: stable
           version: current
-          command : 
-          build configuration -f ${{ github.workspace }}/package/ --name flux-package.xpkg
-          curl -sL https://raw.githubusercontent.com/crossplane/crossplane/master/install.sh | sh -x
-          #login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
-          /usr/local/bin/kubectl-crossplane -f package.xpkg ush configuration -f package/flux-package.xpkg  ghcr.io/junaid18183/crossplane-config-flux:${{ steps.tagger.outputs.VERSION_TAG }}
+          run : |
+            build configuration -f ${{ github.workspace }}/package/ --name flux-package.xpkg
+            curl -sL https://raw.githubusercontent.com/crossplane/crossplane/master/install.sh | sh -x
+            #login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+            /usr/local/bin/kubectl-crossplane -f package.xpkg ush configuration -f package/flux-package.xpkg  ghcr.io/junaid18183/crossplane-config-flux:${{ steps.tagger.outputs.VERSION_TAG }}
       # - name: Install crossplane cli and Push Package
       #   run: |
       #     build configuration -f ${{ github.workspace }}/package/ --name flux-package.xpkg

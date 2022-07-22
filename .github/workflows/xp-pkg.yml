@@ -28,19 +28,8 @@ jobs:
           channel: stable
           version: current
           command : build configuration -f ${{ github.workspace }}/package/ --name flux-package.xpkg
-      - name: Install Up CLI and Push Package
+      - name: Install Up crossplane cli and Push Package
         run: |
-          curl -sL https://cli.upbound.io | sh
-          ./up login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
-          ./up xpkg push -f package.xpkg xpkg.upbound.io/nate-organization/cp-pkg-platform-ref-azure:${{ steps.tagger.outputs.VERSION_TAG }}
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Update manifest
-        run: |
-          sed -i -e "s|package: registry.upbound.io/nate-organization/cp-pkg-platform-ref-azure:.*|package: registry.upbound.io/nate-organization/cp-pkg-platform-ref-azure:${{ steps.tagger.outputs.VERSION_TAG }}|g" ./configuration/configuration.yaml
-      - name: Commit changes
-        uses: EndBug/add-and-commit@v7
-        with:
-          add: '.'
-          message: "github bot package version update"
-          signoff: true
+          curl -sL https://raw.githubusercontent.com/crossplane/crossplane/master/install.sh | sh -x
+          #login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+          kubectl-crossplane -f package.xpkg ush configuration -f package/flux-package.xpkg  ghcr.io/junaid18183/crossplane-config-flux:${{ steps.tagger.outputs.VERSION_TAG }}

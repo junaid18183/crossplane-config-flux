@@ -10,9 +10,9 @@ spec:
   dependsOn:
     - provider: crossplane/provider-helm
       version: "v0.10.0"
-  ignoreCrossplaneConstraints: false
-  package: ghcr.io/junaid18183/crossplane-config-flux:v0.0.2
-  packagePullPolicy: Always
-  revisionActivationPolicy: Automatic
-  revisionHistoryLimit: 1
-  skipDependencyResolution: false
+  # ignoreCrossplaneConstraints: false
+  # package: ghcr.io/junaid18183/crossplane-config-flux:v0.0.2
+  # packagePullPolicy: Always
+  # revisionActivationPolicy: Automatic
+  # revisionHistoryLimit: 1
+  # skipDependencyResolution: false

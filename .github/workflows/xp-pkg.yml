@@ -34,4 +34,4 @@ jobs:
           mv kubectl-crossplane /usr/local/bin
           kubectl crossplane --help
           #login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
-          /usr/local/bin/kubectl-crossplane -f package.xpkg ush configuration -f package/flux-package.xpkg  ghcr.io/junaid18183/crossplane-config-flux:${{ steps.tagger.outputs.VERSION_TAG }}
+          kubectl crossplane push configuration -f package.xpkg ush configuration -f package/flux-package.xpkg  ghcr.io/junaid18183/crossplane-config-flux:${{ steps.tagger.outputs.VERSION_TAG }}

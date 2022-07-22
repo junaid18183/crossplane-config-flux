@@ -31,5 +31,8 @@ jobs:
       - name: Install Up crossplane cli and Push Package
         run: |
           curl -sL https://raw.githubusercontent.com/crossplane/crossplane/master/install.sh | sh -x
+          ls -l 
+          ls -l /usr/local/bin
+          kubectl crossplane --help
           #login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
           /usr/local/bin/kubectl-crossplane -f package.xpkg ush configuration -f package/flux-package.xpkg  ghcr.io/junaid18183/crossplane-config-flux:${{ steps.tagger.outputs.VERSION_TAG }}

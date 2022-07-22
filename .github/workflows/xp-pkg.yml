@@ -28,6 +28,15 @@ jobs:
           channel: stable
           version: current
           command : build configuration -f ${{ github.workspace }}/package/ --name flux-package.xpkg
+
+      - name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: Install Up crossplane cli and Push Package
         run: |
           curl -sL https://raw.githubusercontent.com/crossplane/crossplane/master/install.sh | sh

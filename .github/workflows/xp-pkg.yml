@@ -22,14 +22,16 @@ jobs:
       - name: Set tag
         run: echo "::set-output name=VERSION_TAG::$(git describe --dirty --always --tags | sed 's/-.*//' )"
         id: tagger
-      - name: Build
+      - name: Build and push package
         uses: crossplane-contrib/xpkg-action@v0.2.0
         with:
           channel: stable
           version: current
-          command : build configuration -f ${{ github.workspace }}/package/ --name flux-package.xpkg
-      - name: Install Up crossplane cli and Push Package
+          run : | 
+          build configuration -f ${{ github.workspace }}/package/ --name flux-package.xpkg
+      - name: Install crossplane cli and Push Package
         run: |
+          build configuration -f ${{ github.workspace }}/package/ --name flux-package.xpkg
           curl -sL https://raw.githubusercontent.com/crossplane/crossplane/master/install.sh | sh -x
           #login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
-          kubectl-crossplane -f package.xpkg ush configuration -f package/flux-package.xpkg  ghcr.io/junaid18183/crossplane-config-flux:${{ steps.tagger.outputs.VERSION_TAG }}
+          /usr/local/bin/kubectl-crossplane -f package.xpkg ush configuration -f package/flux-package.xpkg  ghcr.io/junaid18183/crossplane-config-flux:${{ steps.tagger.outputs.VERSION_TAG }}
